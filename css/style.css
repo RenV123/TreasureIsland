@@ -1,0 +1,10 @@
+
+.canvas-container {
+    display: flex;
+    justify-content: center;
+}
+
+.canvas-container canvas {
+    height: calc(100vh - 16px);
+    width: auto;
+}
