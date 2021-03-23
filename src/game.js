@@ -2,6 +2,7 @@ import { Grass } from './GameObjects/grass.js';
 import { TreasureHunter } from './GameObjects/treasureHunter.js';
 import { GameBoard } from './gameBoard.js';
 import { DrawTypes } from './GameObjects/gameObject.js';
+import { Enemy } from './GameObjects/enemy.js';
 
 const canvas = document.getElementById('game-canvas');
 const context = canvas.getContext('2d');
@@ -19,6 +20,9 @@ class Game {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
     this._context = context;
+    this.callbacks = {
+      keydown: this._keydown.bind(this),
+    };
     this._gameboard = new GameBoard(
       canvasWidth,
       canvasHeight,
@@ -27,13 +31,15 @@ class Game {
       treasureCount,
       wallCount
     );
-    this.callbacks = {
-      keydown: this._keydown.bind(this),
-    };
     this._treasureHunter = new TreasureHunter(
       this._gameboard,
       this._onTreasureCollected
     );
+    this._placeOnRandomFreeSpot(this._treasureHunter);
+
+    this._enemy = new Enemy(this._gameboard, this._treasureHunter);
+    this._placeOnRandomFreeSpot(this._enemy);
+
     this.bindEvents();
   }
 
@@ -47,22 +53,25 @@ class Game {
   _keydown = (e) => {
     e.preventDefault();
 
+    let treasureHunterMoved = false;
     switch (e.key) {
       case 'ArrowLeft':
-        this._treasureHunter.moveLeft();
+        treasureHunterMoved = this._treasureHunter.moveLeft();
         break;
       case 'ArrowRight':
-        this._treasureHunter.moveRight();
+        treasureHunterMoved = this._treasureHunter.moveRight();
         break;
       case 'ArrowDown':
-        this._treasureHunter.moveDown();
+        treasureHunterMoved = this._treasureHunter.moveDown();
         break;
       case 'ArrowUp':
-        this._treasureHunter.moveUp();
+        treasureHunterMoved = this._treasureHunter.moveUp();
         break;
     }
-
-    this._drawGame();
+    if (treasureHunterMoved) {
+      this._enemy.moveToTreasureHunter();
+      this._drawGame();
+    }
   };
 
   /**
@@ -126,18 +135,19 @@ class Game {
   _drawGame = () => {
     this._drawBoard();
     this._drawGameObject(this._treasureHunter);
+    this._drawGameObject(this._enemy);
   };
 
   /**
    * Pick a random grass tile to place the treasurehunter
    * @private
    */
-  _placeTreasureHunter = () => {
+  _placeOnRandomFreeSpot = (gameObj) => {
     let tile = this._gameboard.getRandomFreeSpotOnBoard();
-    this._treasureHunter.x = tile.x;
-    this._treasureHunter.y = tile.y;
-    this._treasureHunter.width = tile.width;
-    this._treasureHunter.height = tile.height;
+    gameObj.x = tile.x;
+    gameObj.y = tile.y;
+    gameObj.width = tile.width;
+    gameObj.height = tile.height;
   };
 
   /**
@@ -148,7 +158,6 @@ class Game {
   };
 
   startGame = () => {
-    this._placeTreasureHunter();
     this._drawGame();
   };
 }

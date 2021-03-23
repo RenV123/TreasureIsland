@@ -1,7 +1,7 @@
-import {GameObject} from "./gameObject.js";
+import { GameObject } from './gameObject.js';
 
 export class Grass extends GameObject {
-  color = 'green';
+  color = '#90be6d';
 
   constructor(x, y, width, height) {
     super(x, y, width, height);

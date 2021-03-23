@@ -1,7 +1,7 @@
-import {GameObject} from "./gameObject.js";
+import { GameObject } from './gameObject.js';
 
 export class Wall extends GameObject {
-  color = 'brown';
+  color = '#f3722c';
 
   constructor(x, y, width, height) {
     super(x, y, width, height);

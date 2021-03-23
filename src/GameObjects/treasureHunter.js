@@ -2,7 +2,7 @@ import { GameObject, DrawTypes } from './gameObject.js';
 
 export class TreasureHunter extends GameObject {
   type = DrawTypes.CIRCLE;
-  color = 'darkgreen';
+  color = '#4d908e';
   lives = 3;
   amountOfTreasureCollected = 0;
   whiteListedTiles = ['Grass', 'Treasure'];
