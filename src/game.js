@@ -15,7 +15,7 @@ class Game {
     rows = 15,
     columns = 15,
     treasureCount = 3,
-    wallCount = 10
+    wallCount = 30
   ) {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;

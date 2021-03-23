@@ -17,19 +17,26 @@ export class Enemy extends GameObject {
     if (distance.length() > 1) {
       let direction = Vector2D.divide(distance, distance.length());
       direction = new Vector2D(
-        Math.round(direction.x),
-        Math.round(direction.y)
+        direction.x > 0 ? Math.ceil(direction.x) : Math.floor(direction.x),
+        direction.y > 0 ? Math.ceil(direction.y) : Math.floor(direction.y)
       );
-
-      if (
-        Math.abs(distance.x) >= Math.abs(distance.y) &&
-        this._canMoveOnTile(this.x + direction.x, this.y)
-      ) {
+      let canMoveHorizontallyForward = this._canMoveOnTile(
+        this.x + direction.x,
+        this.y
+      );
+      let canMoveVerticallyForward = this._canMoveOnTile(
+        this.x,
+        this.y + direction.y
+      );
+      if (canMoveHorizontallyForward && canMoveVerticallyForward) {
+        if (Math.abs(distance.x) >= Math.abs(distance.y)) {
+          this.x += direction.x;
+        } else {
+          this.y += direction.y;
+        }
+      } else if (canMoveHorizontallyForward) {
         this.x += direction.x;
-      } else if (
-        Math.abs(distance.x) <= Math.abs(distance.y) &&
-        this._canMoveOnTile(this.x, this.y + direction.y)
-      ) {
+      } else if (canMoveVerticallyForward) {
         this.y += direction.y;
       }
     }
