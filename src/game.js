@@ -30,7 +30,10 @@ class Game {
     this.callbacks = {
       keydown: this._keydown.bind(this),
     };
-    this._treasureHunter = new TreasureHunter(this._gameboard);
+    this._treasureHunter = new TreasureHunter(
+      this._gameboard,
+      this._onTreasureCollected
+    );
     this.bindEvents();
   }
 
@@ -135,6 +138,13 @@ class Game {
     this._treasureHunter.y = tile.y;
     this._treasureHunter.width = tile.width;
     this._treasureHunter.height = tile.height;
+  };
+
+  /**
+   * Called when the treasurehunter collects treasure.
+   */
+  _onTreasureCollected = (treasureTile) => {
+    this._gameboard.collectTreasureTile(treasureTile);
   };
 
   startGame = () => {

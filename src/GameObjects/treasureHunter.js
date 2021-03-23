@@ -9,6 +9,7 @@ export class TreasureHunter extends GameObject {
 
   constructor(
     gameboard,
+    onTreasureCollected,
     x,
     y,
     width,
@@ -20,43 +21,43 @@ export class TreasureHunter extends GameObject {
     this.lives = lives;
     this._gameboard = gameboard;
     this._amountOfTreasureToCollect = amountOfTreasureToCollect;
+    this._onTreasureCollected = onTreasureCollected;
   }
 
   moveLeft() {
-    if (this._canMove(this.x - 1, this.y)) {
-      this.x--;
-      return true;
-    }
-    return false;
+    let tile = this._gameboard.getTile(this.x - 1, this.y);
+    return this._moveToTile(tile);
   }
 
   moveRight() {
-    if (this._canMove(this.x + 1, this.y)) {
-      this.x++;
-      return true;
-    }
-    return false;
+    let tile = this._gameboard.getTile(this.x + 1, this.y);
+    return this._moveToTile(tile);
   }
 
   moveUp() {
-    if (this._canMove(this.x, this.y - 1)) {
-      this.y--;
-      return true;
-    }
-    return false;
+    let tile = this._gameboard.getTile(this.x, this.y - 1);
+    return this._moveToTile(tile);
   }
 
   moveDown() {
-    if (this._canMove(this.x, this.y + 1)) {
-      this.y++;
+    let tile = this._gameboard.getTile(this.x, this.y + 1);
+    return this._moveToTile(tile);
+  }
+
+  _moveToTile(tile) {
+    if (this._canMoveOnTile(tile)) {
+      if (tile.constructor.name == 'Treasure') {
+        this.amountOfTreasureCollected++;
+        this._onTreasureCollected(tile);
+      }
+      this.x = tile.x;
+      this.y = tile.y;
       return true;
     }
     return false;
   }
 
-  _canMove(x, y) {
-    let tile = this._gameboard.getTile(x, y);
-
+  _canMoveOnTile(tile) {
     return this.whiteListedTiles.includes(tile.constructor.name);
   }
 }

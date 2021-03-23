@@ -96,4 +96,16 @@ export class GameBoard {
   getTile(x, y) {
     return this._tiles[y][x];
   }
+
+  collectTreasureTile(tile) {
+    let index = this._treasureTiles.findIndex((t) => t === tile);
+    if (index !== -1) {
+      let grass = new Grass(tile.x, tile.y, tile.width, tile.height);
+      this._treasureTiles.splice(index, 1);
+
+      this._tiles[tile.y][tile.x] = grass;
+    } else {
+      console.error('Treasure tile is not in board!');
+    }
+  }
 }
