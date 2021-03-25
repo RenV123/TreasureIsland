@@ -12,10 +12,10 @@ class Game {
     context,
     canvasWidth,
     canvasHeight,
-    rows = 15,
-    columns = 15,
+    rows = 10,
+    columns = 10,
     treasureCount = 3,
-    wallCount = 30
+    wallCount = 15
   ) {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
@@ -51,20 +51,22 @@ class Game {
   };
 
   _keydown = (e) => {
-    e.preventDefault();
-
     let treasureHunterMoved = false;
     switch (e.key) {
       case 'ArrowLeft':
+        e.preventDefault();
         treasureHunterMoved = this._treasureHunter.moveLeft();
         break;
       case 'ArrowRight':
+        e.preventDefault();
         treasureHunterMoved = this._treasureHunter.moveRight();
         break;
       case 'ArrowDown':
+        e.preventDefault();
         treasureHunterMoved = this._treasureHunter.moveDown();
         break;
       case 'ArrowUp':
+        e.preventDefault();
         treasureHunterMoved = this._treasureHunter.moveUp();
         break;
     }
@@ -117,15 +119,26 @@ class Game {
   _drawBoard = () => {
     //draw background same as grass
     if (this._gameboard.tiles.length > 0) {
-      this._context.fillStyle = new Grass().color;
-      this._context.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+      /* this._context.fillStyle = new Grass().color;
+      this._context.fillRect(0, 0, this.canvasWidth, this.canvasHeight);*/
 
       this._gameboard.tiles.forEach((tilesRow) => {
         tilesRow.forEach((tile) => {
           //FIXME: we assume the tile dimensions don't exceed canvas dimensions
-          if (tile.constructor.name !== 'Grass') {
-            //Don't render the grass tiles for now.
-            this._drawGameObject(tile);
+          //if (tile.constructor.name !== 'Grass') {
+          //Don't render the grass tiles for now.
+          this._drawGameObject(tile);
+          //}
+        });
+      });
+
+      //Temporary debug code
+      let grassColor = new Grass().color;
+      this._gameboard.tiles.forEach((tilesRow) => {
+        tilesRow.forEach((tile) => {
+          //FIXME: we assume the tile dimensions don't exceed canvas dimensions
+          if (tile.constructor.name === 'Grass') {
+            tile.color = grassColor;
           }
         });
       });

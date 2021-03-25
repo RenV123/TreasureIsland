@@ -94,7 +94,7 @@ export class GameBoard {
   };
 
   getTile(x, y) {
-    return this._tiles[y][x];
+    return this._tiles[y]?.[x];
   }
 
   collectTreasureTile(tile) {
