@@ -15,7 +15,7 @@ class Game {
     rows = 10,
     columns = 10,
     treasureCount = 3,
-    wallCount = 15
+    wallCount = 20
   ) {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
@@ -110,6 +110,13 @@ class Game {
       default:
         console.log(`Drawtype not defined: ${gameObject.toString()}`);
     }
+
+    //Debug
+    this._context.fillStyle = 'white';
+    this._context.fillText(gameObject.pos.toString(), gameObject.x * gameObject.width + 10,
+        gameObject.y * gameObject.height + 10,
+        gameObject.width,
+        gameObject.height);
   };
 
   /**
