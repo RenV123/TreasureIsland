@@ -28,11 +28,15 @@ export class Enemy extends GameObject {
     this._findTreasureHunterPathRecursive(pathWayData);
 
     if (pathWayData.goodPaths?.[0]?.length > 0) {
-      pathWayData.goodPaths[0].forEach((pos) => {
-        if (!pos.equals(this.pos)) {
-          let tile = this._gameboard.getTile(pos.x, pos.y);
-          tile.color = '#99c247';
-        }
+      let color = '#99c247';
+      pathWayData.goodPaths.reverse().forEach((pathway) => {
+        color = colorShade(color, +10);
+        pathway.forEach((spot) => {
+          if (!spot.equals(this.pos)) {
+            let tile = this._gameboard.getTile(spot.x, spot.y);
+            tile.color = color;
+          }
+        });
       });
 
       this.x = pathWayData.goodPaths[0][1].x;
