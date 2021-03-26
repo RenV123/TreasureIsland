@@ -27,20 +27,24 @@ export class Enemy extends GameObject {
     pathWayData.activePaths.push([tilePos]);
     this._findTreasureHunterPathRecursive(pathWayData);
 
+    pathWayData.listOfCheckedSpots.forEach((spot) => {
+      let tile = this._gameboard.getTile(spot.x, spot.y);
+      tile.color = '#7EB356';
+    });
+
     if (pathWayData.goodPaths?.[0]?.length > 0) {
+      this.x = pathWayData.goodPaths[0][1].x;
+      this.y = pathWayData.goodPaths[0][1].y;
+
+      //Debug draw all goodpaths
       let color = '#99c247';
       pathWayData.goodPaths.reverse().forEach((pathway) => {
         color = colorShade(color, +10);
         pathway.forEach((spot) => {
-          if (!spot.equals(this.pos)) {
-            let tile = this._gameboard.getTile(spot.x, spot.y);
-            tile.color = color;
-          }
+          let tile = this._gameboard.getTile(spot.x, spot.y);
+          tile.color = color;
         });
       });
-
-      this.x = pathWayData.goodPaths[0][1].x;
-      this.y = pathWayData.goodPaths[0][1].y;
     }
   }
 
@@ -61,13 +65,6 @@ export class Enemy extends GameObject {
           this._gameboard.getTile(pos.x, pos.y - 1),
         ];
 
-        tileArr.sort((tileA, tileB) => {
-          return (
-            Vector2D.subtract(this._treasureHunter.pos, tileB.pos).length() -
-            Vector2D.subtract(this._treasureHunter.pos, tileA.pos).length()
-          );
-        });
-
         let isDeadEnd = true;
         tileArr.forEach((tile) => {
           if (
@@ -76,13 +73,13 @@ export class Enemy extends GameObject {
             !pathWayData.listOfCheckedSpots.includes(tile.pos)
           ) {
             isDeadEnd = false;
-            pathWayData.listOfCheckedSpots.push(tile.pos);
 
             //Found path to the treasureHunter
             if (tile.pos.equals(this._treasureHunter.pos)) {
               pathWayData.goodPaths.push([...pathway, tile.pos]);
             } else {
               //Keep looking
+              pathWayData.listOfCheckedSpots.push(tile.pos);
               newActivePaths.push([...pathway, tile.pos]);
             }
           }
@@ -93,7 +90,10 @@ export class Enemy extends GameObject {
       } else console.error('Found undefined or empty pathway.');
     }
     pathWayData.activePaths = newActivePaths;
-    if (pathWayData.activePaths.length > 0) {
+    if (
+      pathWayData.activePaths.length > 0 &&
+      pathWayData.goodPaths.length == 0
+    ) {
       this._findTreasureHunterPathRecursive(pathWayData);
     }
     //Sort by length to get the shortest path

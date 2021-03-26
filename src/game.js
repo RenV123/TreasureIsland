@@ -12,10 +12,10 @@ class Game {
     context,
     canvasWidth,
     canvasHeight,
-    rows = 10,
-    columns = 10,
+    rows = 30,
+    columns = 30,
     treasureCount = 3,
-    wallCount = 20
+    wallCount = 100
   ) {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
@@ -112,11 +112,14 @@ class Game {
     }
 
     //Debug
-    this._context.fillStyle = 'white';
-    this._context.fillText(gameObject.pos.toString(), gameObject.x * gameObject.width + 10,
-        gameObject.y * gameObject.height + 10,
-        gameObject.width,
-        gameObject.height);
+    /*this._context.fillStyle = 'white';
+    this._context.fillText(
+      gameObject.pos.toString(),
+      gameObject.x * gameObject.width + 10,
+      gameObject.y * gameObject.height + 10,
+      gameObject.width,
+      gameObject.height
+    );*/
   };
 
   /**
