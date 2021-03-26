@@ -1,4 +1,5 @@
 import { Vector2D } from '../Helpers/vector2D.js';
+import { colorShade } from '../Helpers/helperlib.js';
 import { GameObject, DrawTypes } from './gameObject.js';
 
 export class Enemy extends GameObject {
@@ -15,52 +16,59 @@ export class Enemy extends GameObject {
   moveToTreasureHunter() {
     let pathWayData = {
       listOfPathWays: [],
-      foundPathToTreasureHunter: false,
-      goldenPathIndex: -1,
       listOfCheckedSpots: [],
     };
 
     pathWayData.listOfPathWays.push([]);
-    this._moveToTreasureHunterRecursive(this.pos, 0, pathWayData);
+
+    //Use tilepos instead
+    let tilePos = this._gameboard.getTile(this.pos.x, this.pos.y).pos;
+
+    this._moveToTreasureHunterRecursive(tilePos, 0, pathWayData);
 
     //Filter out all pathways that do not end on the treasurehunter pos.
-    pathWayData.listOfPathWays = pathWayData.listOfPathWays.filter(
-      (pathway) => {
-        return (
-          pathway.length > 0 &&
-          this._treasureHunter.pos.equals(pathway[pathway.length - 1])
-        );
-      }
-    );
+    let validPathways = pathWayData.listOfPathWays.filter((pathway) => {
+      return (
+        pathway.length > 0 &&
+        this._treasureHunter.pos.equals(pathway[pathway.length - 1])
+      );
+    });
 
-    pathWayData.listOfPathWays.sort(
-      (pathA, pathB) => pathA.length - pathB.length
-    );
+    validPathways.sort((pathA, pathB) => pathA.length - pathB.length);
 
-    if (pathWayData.listOfPathWays[0]?.length) {
+    if (validPathways[0]?.length) {
       console.log('Eureka!');
-      this.x = pathWayData.listOfPathWays[0]?.[0].x;
-      this.y = pathWayData.listOfPathWays[0]?.[0].y;
+      this.x = validPathways[0]?.[0]?.x;
+      this.y = validPathways[0]?.[0]?.y;
     }
 
-    pathWayData.listOfCheckedSpots.forEach((spot) => {
+    //Only for debugging
+
+    //show all traveled spots as ligt green
+    pathWayData.listOfCheckedSpots?.forEach((spot) => {
       let tile = this._gameboard.getTile(spot.x, spot.y);
-      tile.color = '#93B27B';
+      tile.color = '#A9CC8E';
     });
-    pathWayData.listOfPathWays[0]?.forEach((spot) => {
-      let tile = this._gameboard.getTile(spot.x, spot.y);
-      tile.color = '#8ED954';
+
+    //show all valid paths from most valid to least (lighter to darker)
+    let color = '#99c247';
+    validPathways.reverse().forEach((pathway) => {
+      color = colorShade(color, +10);
+      pathway.forEach((spot) => {
+        let tile = this._gameboard.getTile(spot.x, spot.y);
+        tile.color = color;
+      });
     });
   }
 
   _moveToTreasureHunterRecursive(pos, pathWayIndex, pathWayData) {
     //prevent checking the same spots twice
-    pathWayData.listOfCheckedSpots.push(pos);
+    if (pos) {
+      pathWayData.listOfCheckedSpots.push(pos);
+    } else return;
 
     //Check if we found the pos of the treasurehunter
     if (pos.equals(this._treasureHunter.pos)) {
-      pathWayData.foundPathToTreasureHunter = true;
-      pathWayData.goldenPathIndex = pathWayIndex;
       return;
     }
 
@@ -89,13 +97,20 @@ export class Enemy extends GameObject {
         );
       });
 
+      let tempCopyOfCurrentPathwayPos = [
+        ...pathWayData.listOfPathWays[pathWayIndex],
+      ];
       for (let i = 0; i < tileArr.length; i++) {
         if (
           tileArr[i] &&
           this.whiteListedTiles.includes(tileArr[i].constructor.name) &&
           !pathWayData.listOfCheckedSpots.includes(tileArr[i].pos)
         ) {
-          if (i < 2) {
+          if (tileArr[i].pos.equals(this._treasureHunter.pos)) {
+            pathWayData.listOfPathWays[pathWayIndex].push(tileArr[i].pos);
+            return;
+          }
+          /* if (i < 2) {
             //first two spots are presumed closer to the target make no new pathways
             pathWayData.listOfPathWays[pathWayIndex].push(tileArr[i].pos);
             this._moveToTreasureHunterRecursive(
@@ -103,19 +118,18 @@ export class Enemy extends GameObject {
               pathWayIndex,
               pathWayData
             );
-            return;
-          } else {
-            //last spots are further from the target make new pathways
-            pathWayData.listOfPathWays.push([
-              ...pathWayData.listOfPathWays[pathWayIndex],
-              tileArr[i].pos,
-            ]);
-            this._moveToTreasureHunterRecursive(
-              tileArr[i].pos,
-              pathWayIndex + 1,
-              pathWayData
-            );
-          }
+         } else {*/
+          //last spots are further from the target make new pathways
+          pathWayData.listOfPathWays.push([
+            ...tempCopyOfCurrentPathwayPos,
+            tileArr[i].pos,
+          ]);
+          this._moveToTreasureHunterRecursive(
+            tileArr[i].pos,
+            pathWayData.listOfPathWays.length - 1,
+            pathWayData
+          );
+          /*}*/
         }
       }
     }
