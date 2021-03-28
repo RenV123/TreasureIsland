@@ -12,10 +12,10 @@ class Game {
     context,
     canvasWidth,
     canvasHeight,
-    rows = 30,
-    columns = 30,
+    rows = 25,
+    columns = 25,
     treasureCount = 3,
-    wallCount = 100
+    wallCount = 200
   ) {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
@@ -23,6 +23,7 @@ class Game {
     this.callbacks = {
       keydown: this._keydown.bind(this),
     };
+
     this._gameboard = new GameBoard(
       canvasWidth,
       canvasHeight,
@@ -31,15 +32,17 @@ class Game {
       treasureCount,
       wallCount
     );
+
     this._treasureHunter = new TreasureHunter(
       this._gameboard,
       this._onTreasureCollected
     );
-    this._placeOnRandomFreeSpot(this._treasureHunter);
-
     this._enemy = new Enemy(this._gameboard, this._treasureHunter);
-    this._placeOnRandomFreeSpot(this._enemy);
 
+    this._gameboard.placeTreasureHunterAndEnemy(
+      this._treasureHunter,
+      this._enemy
+    );
     this.bindEvents();
   }
 
@@ -160,19 +163,6 @@ class Game {
     this._drawGameObject(this._treasureHunter);
     this._drawGameObject(this._enemy);
   };
-
-  /**
-   * Pick a random grass tile to place the treasurehunter
-   * @private
-   */
-  _placeOnRandomFreeSpot = (gameObj) => {
-    let tile = this._gameboard.getRandomFreeSpotOnBoard();
-    gameObj.x = tile.x;
-    gameObj.y = tile.y;
-    gameObj.width = tile.width;
-    gameObj.height = tile.height;
-  };
-
   /**
    * Called when the treasurehunter collects treasure.
    */
