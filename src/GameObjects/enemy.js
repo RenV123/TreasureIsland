@@ -8,7 +8,7 @@ import {
 import { GameObject, DrawTypes } from './gameObject.js';
 
 export class Enemy extends GameObject {
-  type = DrawTypes.CIRCLE;
+  type = DrawTypes.IMG;
   color = '#F94144';
   whiteListedTiles = ['Grass'];
 
@@ -25,6 +25,7 @@ export class Enemy extends GameObject {
     this._gameboard = gameboard;
     this._treasureHunter = treasureHunter;
     this._intelligence = intelligence;
+    this.imgSrc = './img/tile-enemy-1.webp';
   }
 
   moveToTreasureHunter() {

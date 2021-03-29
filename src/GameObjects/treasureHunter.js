@@ -1,7 +1,7 @@
 import { GameObject, DrawTypes } from './gameObject.js';
 
 export class TreasureHunter extends GameObject {
-  type = DrawTypes.CIRCLE;
+  type = DrawTypes.IMG;
   color = '#4d908e';
   lives = 3;
   whiteListedTiles = ['Grass', 'Treasure'];
@@ -12,6 +12,7 @@ export class TreasureHunter extends GameObject {
     this.lives = lives;
     this._gameboard = gameboard;
     this._onTreasureCollected = onTreasureCollected;
+    this.imgSrc = './img/tile-treasurehunter-1.webp';
   }
 
   moveLeft() {

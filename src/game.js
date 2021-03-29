@@ -27,8 +27,6 @@ class Game {
 
     this._imageManager = new ImageManager();
 
-    this._loadAllImages();
-
     this._gameboard = new GameBoard(
       canvasWidth,
       canvasHeight,
@@ -51,17 +49,6 @@ class Game {
     );
     this.bindEvents();
   }
-
-  _loadAllImages = () => {
-    //TODO: find a better way for this:
-    this._imageManager.loadImage('./img/tile-grass-1.webp');
-    this._imageManager.loadImage('./img/tile-grass-2.webp');
-    this._imageManager.loadImage('./img/tile-grass-3.webp');
-    this._imageManager.loadImage('./img/tile-treasure-1.webp');
-    this._imageManager.loadImage('./img/tile-wall-1.webp');
-    this._imageManager.loadImage('./img/tile-wall-2.webp');
-    this._imageManager.loadImage('./img/tile-wall-3.webp');
-  };
 
   bindEvents = () => {
     document.addEventListener('keydown', this.callbacks.keydown, false);
