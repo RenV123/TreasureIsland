@@ -23,6 +23,8 @@ class Game {
     this._context = context;
     this.callbacks = {
       keydown: this._keydown.bind(this),
+      keyButtonDown: this._keyButtonDown.bind(this),
+      resetKeyButtonStates: this._resetKeyButtonStates.bind(this),
     };
 
     this._imageManager = new ImageManager();
@@ -52,23 +54,83 @@ class Game {
 
   bindEvents = () => {
     document.addEventListener('keydown', this.callbacks.keydown, false);
+    document.addEventListener(
+      'mouseup',
+      this.callbacks.resetKeyButtonStates,
+      false
+    );
+    document.addEventListener(
+      'touchend',
+      this.callbacks.resetKeyButtonStates,
+      false
+    );
 
     Array.from(
       document.querySelectorAll('#game-buttons-container button')
     ).forEach((button) => {
-      button.addEventListener('mousedown', (e) => {
-        let img = button.children[0];
-        img.src = `./img/${button.id}-pressed.webp`;
-        this._move(button.dataset.key);
-      });
-      button.addEventListener('mouseup', (e) => {
-        let img = button.children[0];
-        img.src = `./img/${button.id}.webp`;
-      });
+      button.addEventListener('mousedown', this.callbacks.keyButtonDown, false);
+      button.addEventListener(
+        'touchstart',
+        this.callbacks.keyButtonDown,
+        false
+      );
     });
   };
   unbindEvents = () => {
-    document.addEventListener('keydown', this.callbacks.keydown, false);
+    document.removeEventListener('keydown', this.callbacks.keydown, false);
+    document.removeEventListener(
+      'mouseup',
+      this.callbacks.resetKeyButtonStates,
+      false
+    );
+    document.removeEventListener(
+      'touchend',
+      this.callbacks.resetKeyButtonStates,
+      false
+    );
+
+    Array.from(
+      document.querySelectorAll('#game-buttons-container button')
+    ).forEach((button) => {
+      button.removeEventListener(
+        'mousedown',
+        this.callbacks.keyButtonDown,
+        false
+      );
+      button.removeEventListener(
+        'touchstart',
+        this.callbacks.keyButtonDown,
+        false
+      );
+    });
+  };
+
+  _keyButtonDown = (e) => {
+    let button = e.currentTarget;
+    let img = button.children[0];
+    img.src = `./img/${button.id}-pressed.webp`;
+
+    //move first
+    this._move(button.dataset.key);
+
+    //continue moving every x ms;
+    if (!this._moveTimerId) {
+      this._moveTimerId = setInterval(this._move, 100, button.dataset.key);
+    }
+  };
+
+  _resetKeyButtonStates = () => {
+    if (this._moveTimerId) {
+      clearInterval(this._moveTimerId);
+      this._moveTimerId = undefined;
+    }
+    console.log(`reset btn called`);
+    Array.from(
+      document.querySelectorAll('#game-buttons-container button')
+    ).forEach((button) => {
+      let img = button.children[0];
+      img.src = `./img/${button.id}.webp`;
+    });
   };
 
   _keydown = (e) => {
@@ -78,7 +140,7 @@ class Game {
       case 'ArrowDown':
       case 'ArrowUp':
         e.preventDefault();
-        _move(e.key);
+        this._move(e.key);
     }
   };
 
