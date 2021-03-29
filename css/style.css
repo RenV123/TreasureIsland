@@ -6,7 +6,7 @@
 }
 
 .canvas-container canvas {
-  width: min(calc(100vh - 16px - 138.5px - 40px), 100%);
+  width: min(calc(100vh - 310px), 100%);
   height: auto;
 }
 
@@ -18,13 +18,45 @@
 }
 
 #game-buttons-container button {
-  background: transparent;
   border: none !important;
-}
-
-#game-buttons-container button img {
+  height: 10vh;
+  width: 10vh;
   margin: 0px;
   padding: 0px;
-  height: 5vh;
-  width: auto;
+}
+
+#key-up {
+  background: no-repeat center/cover url('../img/key-up.webp');
+
+  /* Firefox */
+  image-rendering: crisp-edges;
+  /* Chromium + Safari */
+  image-rendering: pixelated;
+}
+
+#key-left {
+  background: no-repeat center/cover url('../img/key-left.webp');
+
+  /* Firefox */
+  image-rendering: crisp-edges;
+  /* Chromium + Safari */
+  image-rendering: pixelated;
+}
+
+#key-down {
+  background: no-repeat center/cover url('../img/key-down.webp');
+
+  /* Firefox */
+  image-rendering: crisp-edges;
+  /* Chromium + Safari */
+  image-rendering: pixelated;
+}
+
+#key-right {
+  background: no-repeat center/cover url('../img/key-right.webp');
+
+  /* Firefox */
+  image-rendering: crisp-edges;
+  /* Chromium + Safari */
+  image-rendering: pixelated;
 }

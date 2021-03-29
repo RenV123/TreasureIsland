@@ -115,15 +115,16 @@ class Game {
 
   _keyButtonDown = (e) => {
     let button = e.currentTarget;
-    let img = button.children[0];
-    img.src = `./img/${button.id}-pressed.webp`;
+    if (button) {
+      button.style.background = `no-repeat center/cover url('./img/${button.id}-pressed.webp')`;
+    }
 
     //move first
     this._move(button.dataset.key);
 
     //continue moving every x ms;
     if (!this._moveTimerId) {
-      this._moveTimerId = setInterval(this._move, 100, button.dataset.key);
+      this._moveTimerId = setInterval(this._move, 200, button.dataset.key);
     }
   };
 
@@ -135,8 +136,7 @@ class Game {
     Array.from(
       document.querySelectorAll('#game-buttons-container button')
     ).forEach((button) => {
-      let img = button.children[0];
-      img.src = `./img/${button.id}.webp`;
+      button.style.background = `no-repeat center/cover url('./img/${button.id}.webp')`;
     });
   };
 
@@ -145,8 +145,7 @@ class Game {
       `#game-buttons-container button[data-key="${e.key}"]`
     );
     if (button) {
-      let img = button.children[0];
-      img.src = `./img/${button.id}-pressed.webp`;
+      button.style.background = `no-repeat center/cover url('./img/${button.id}-pressed.webp')`;
     }
 
     switch (e.key) {
