@@ -64,6 +64,11 @@ class Game {
       this.callbacks.resetKeyButtonStates,
       false
     );
+    document.addEventListener(
+      'keyup',
+      this.callbacks.resetKeyButtonStates,
+      false
+    );
 
     Array.from(
       document.querySelectorAll('#game-buttons-container button')
@@ -134,6 +139,11 @@ class Game {
   };
 
   _keydown = (e) => {
+    let button = document.querySelector(
+      `#game-buttons-container button[data-key="${e.key}"]`
+    );
+    let img = button.children[0];
+    img.src = `./img/${button.id}-pressed.webp`;
     switch (e.key) {
       case 'ArrowLeft':
       case 'ArrowRight':
