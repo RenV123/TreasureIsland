@@ -11,12 +11,20 @@ export class Enemy extends GameObject {
   type = DrawTypes.CIRCLE;
   color = '#F94144';
   whiteListedTiles = ['Grass'];
-  _intelligence = 75;
 
-  constructor(gameboard, treasureHunter, x, y, width, height) {
+  constructor(
+    gameboard,
+    treasureHunter,
+    x,
+    y,
+    width,
+    height,
+    intelligence = 75
+  ) {
     super(x, y, width, height);
     this._gameboard = gameboard;
     this._treasureHunter = treasureHunter;
+    this._intelligence = intelligence;
   }
 
   moveToTreasureHunter() {
@@ -56,10 +64,10 @@ export class Enemy extends GameObject {
       if (matchingTile) {
         this.x = matchingTile.x;
         this.y = matchingTile.y;
-      }
 
-      //debugging
-      matchingTile.color = 'darkred';
+        //debugging
+        matchingTile.color = 'darkred';
+      }
     } else if (pathWayData.goodPaths?.[0]?.length > 0) {
       this.x = pathWayData.goodPaths[0][1].x;
       this.y = pathWayData.goodPaths[0][1].y;

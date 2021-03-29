@@ -9,11 +9,14 @@ export const DrawTypes = Object.freeze({
 });
 
 export class GameObject {
-  constructor(x, y, width, height) {
+  constructor(x, y, width, height, imgSrc) {
     this.type = DrawTypes.RECT;
     this.pos = new Vector2D(x, y);
     this.width = width;
     this.height = height;
+    if (imgSrc) {
+      this.imgSrc = imgSrc;
+    }
   }
   get x() {
     return this.pos.x;

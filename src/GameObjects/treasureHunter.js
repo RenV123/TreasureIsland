@@ -4,23 +4,13 @@ export class TreasureHunter extends GameObject {
   type = DrawTypes.CIRCLE;
   color = '#4d908e';
   lives = 3;
-  amountOfTreasureCollected = 0;
   whiteListedTiles = ['Grass', 'Treasure'];
+  amountOfTreasureCollected = 0;
 
-  constructor(
-    gameboard,
-    onTreasureCollected,
-    x,
-    y,
-    width,
-    height,
-    lives,
-    amountOfTreasureToCollect
-  ) {
+  constructor(gameboard, onTreasureCollected, x, y, width, height, lives) {
     super(x, y, width, height);
     this.lives = lives;
     this._gameboard = gameboard;
-    this._amountOfTreasureToCollect = amountOfTreasureToCollect;
     this._onTreasureCollected = onTreasureCollected;
   }
 

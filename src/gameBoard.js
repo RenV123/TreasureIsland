@@ -9,13 +9,16 @@ export class GameBoard {
   _grassTiles = [];
   _treasureTiles = [];
   _wallTiles = [];
+  _treasureCollected = 0;
+
   constructor(
     canvasWidth,
     canvasHeight,
     rows = 15,
     columns = 15,
     treasureCount = 3,
-    wallCount = 10
+    wallCount = 10,
+    onAllTreasureCollected
   ) {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
@@ -23,8 +26,9 @@ export class GameBoard {
     this._columns = columns;
     this._treasureCount = treasureCount;
     this._wallCount = wallCount;
+    this._onAllTreasureCollected = onAllTreasureCollected;
 
-    this._generateTiles();
+    this.generateBoard();
   }
 
   get tiles() {
@@ -33,9 +37,9 @@ export class GameBoard {
 
   /**
    * Generates tiles of the board.
-   * @private
    */
-  _generateTiles = () => {
+  generateBoard = () => {
+    this._treasureCollected = 0;
     this._tiles = [];
     this._treasureTiles = [];
     this._wallTiles = [];
@@ -109,7 +113,7 @@ export class GameBoard {
           canFindAllTreasure = false;
       });
       if (!canFindAllTreasure) {
-        this._generateTiles();
+        this.generateBoard();
       } else {
         treasureHunter.x = grassTile.pos.x;
         treasureHunter.y = grassTile.pos.y;
@@ -178,6 +182,11 @@ export class GameBoard {
       this._treasureTiles.splice(index, 1);
 
       this._tiles[tile.y][tile.x] = grass;
+
+      this._treasureCollected++;
+      if (this._treasureCollected == this._treasureCount) {
+        this._onAllTreasureCollected();
+      }
     } else {
       console.error('Treasure tile is not in board!');
     }
