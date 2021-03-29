@@ -1,17 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>TreasureIsland</title>
 
-    <script src="src/game.js"  type="module"></script>
-    <link rel="stylesheet" href="./css/style.css"/>
+    <script src="src/game.js" type="module"></script>
+    <link rel="stylesheet" href="./css/style.css" />
 </head>
+
 <body>
-<div class="canvas-container">
-    <canvas id="game-canvas" width="1000" height="1000">
-        <p>Please enable Javascript!</p>
-    </canvas>
-</div>
+    <div class="canvas-container">
+        <canvas id="game-canvas" width="1000" height="1000">
+            <p>Please enable Javascript!</p>
+        </canvas>
+    </div>
+    <div id="game-buttons-container">
+        <button id="key-up" data-key="ArrowUp">
+            <img width="32" height="30" src="./img/key-up.webp">
+        </button>
+        <div>
+            <button id="key-left" data-key="ArrowLeft">
+                <img width="32" height="30" src="./img/key-left.webp">
+            </button>
+            <button id="key-down" data-key="ArrowDown">
+                <img width="32" height="30" src="./img/key-down.webp">
+            </button>
+            <button id="key-right" data-key="ArrowRight">
+                <img width="32" height="30" src="./img/key-right.webp">
+            </button>
+        </div>
+    </div>
 </body>
+
 </html>

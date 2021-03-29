@@ -52,28 +52,49 @@ class Game {
 
   bindEvents = () => {
     document.addEventListener('keydown', this.callbacks.keydown, false);
+
+    Array.from(
+      document.querySelectorAll('#game-buttons-container button')
+    ).forEach((button) => {
+      button.addEventListener('mousedown', (e) => {
+        let img = button.children[0];
+        img.src = `./img/${button.id}-pressed.webp`;
+        this._move(button.dataset.key);
+      });
+      button.addEventListener('mouseup', (e) => {
+        let img = button.children[0];
+        img.src = `./img/${button.id}.webp`;
+      });
+    });
   };
   unbindEvents = () => {
     document.addEventListener('keydown', this.callbacks.keydown, false);
   };
 
   _keydown = (e) => {
-    let treasureHunterMoved = false;
     switch (e.key) {
       case 'ArrowLeft':
+      case 'ArrowRight':
+      case 'ArrowDown':
+      case 'ArrowUp':
         e.preventDefault();
+        _move(e.key);
+    }
+  };
+
+  _move = (key) => {
+    let treasureHunterMoved = false;
+    switch (key) {
+      case 'ArrowLeft':
         treasureHunterMoved = this._treasureHunter.moveLeft();
         break;
       case 'ArrowRight':
-        e.preventDefault();
         treasureHunterMoved = this._treasureHunter.moveRight();
         break;
       case 'ArrowDown':
-        e.preventDefault();
         treasureHunterMoved = this._treasureHunter.moveDown();
         break;
       case 'ArrowUp':
-        e.preventDefault();
         treasureHunterMoved = this._treasureHunter.moveUp();
         break;
     }
