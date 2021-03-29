@@ -49,6 +49,6 @@ export class TreasureHunter extends GameObject {
   }
 
   _canMoveOnTile(tile) {
-    return this.whiteListedTiles.includes(tile.constructor.name);
+    return tile && this.whiteListedTiles.includes(tile.constructor.name);
   }
 }

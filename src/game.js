@@ -8,6 +8,9 @@ import { ImageManager } from './Helpers/imageManager.js';
 const canvas = document.getElementById('game-canvas');
 const context = canvas.getContext('2d');
 
+//TODO: find a better way to declare global variables.
+window.DEBUG_MODE = false;
+
 class Game {
   constructor(
     context,
@@ -129,7 +132,6 @@ class Game {
       clearInterval(this._moveTimerId);
       this._moveTimerId = undefined;
     }
-    console.log(`reset btn called`);
     Array.from(
       document.querySelectorAll('#game-buttons-container button')
     ).forEach((button) => {
@@ -142,8 +144,11 @@ class Game {
     let button = document.querySelector(
       `#game-buttons-container button[data-key="${e.key}"]`
     );
-    let img = button.children[0];
-    img.src = `./img/${button.id}-pressed.webp`;
+    if (button) {
+      let img = button.children[0];
+      img.src = `./img/${button.id}-pressed.webp`;
+    }
+
     switch (e.key) {
       case 'ArrowLeft':
       case 'ArrowRight':
@@ -151,6 +156,13 @@ class Game {
       case 'ArrowUp':
         e.preventDefault();
         this._move(e.key);
+        break;
+      case 'd':
+        e.preventDefault();
+        if (e.ctrlKey) {
+          window.DEBUG_MODE = !window.DEBUG_MODE;
+          this._drawGame();
+        }
     }
   };
 
@@ -195,7 +207,7 @@ class Game {
             gameObject.width,
             gameObject.height
           );
-          break;
+          if (!DEBUG_MODE) break;
         }
       // else fallback on drawrect
       case DrawTypes.RECT:
@@ -223,14 +235,16 @@ class Game {
     }
 
     //Debug
-    /*this._context.fillStyle = 'white';
-    this._context.fillText(
-      gameObject.pos.toString(),
-      gameObject.x * gameObject.width + 10,
-      gameObject.y * gameObject.height + 10,
-      gameObject.width,
-      gameObject.height
-    );*/
+    if (this.DEBUG_MODE) {
+      this._context.fillStyle = 'white';
+      this._context.fillText(
+        gameObject.pos.toString(),
+        gameObject.x * gameObject.width + 10,
+        gameObject.y * gameObject.height + 10,
+        gameObject.width,
+        gameObject.height
+      );
+    }
   };
 
   /**

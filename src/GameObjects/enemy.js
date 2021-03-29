@@ -37,11 +37,12 @@ export class Enemy extends GameObject {
 
     let chanceOfStupidity = getRandomNr(0, 100);
 
-    /*pathWayData.listOfCheckedSpots.forEach((spot) => {
-      let tile = this._gameboard.getTile(spot.x, spot.y);
-      tile.color = '#7EB356';
-    });*/
-
+    if (window.DEBUG_MODE) {
+      pathWayData.listOfCheckedSpots.forEach((spot) => {
+        let tile = this._gameboard.getTile(spot.x, spot.y);
+        tile.color = '#7EB356';
+      });
+    }
     //Make a random move depending on intelligence level
     if (
       chanceOfStupidity > this._intelligence ||
@@ -67,21 +68,23 @@ export class Enemy extends GameObject {
         this.y = matchingTile.y;
 
         //debugging
-        matchingTile.color = 'darkred';
+        if (window.DEBUG_MODE) matchingTile.color = 'darkred';
       }
     } else if (pathWayData.goodPaths?.[0]?.length > 0) {
       this.x = pathWayData.goodPaths[0][1].x;
       this.y = pathWayData.goodPaths[0][1].y;
 
       //Debug draw all goodpaths
-      let color = '#99c247';
-      pathWayData.goodPaths.reverse().forEach((pathway) => {
-        color = colorShade(color, +10);
-        pathway.forEach((spot) => {
-          let tile = this._gameboard.getTile(spot.x, spot.y);
-          tile.color = color;
+      if (window.DEBUG_MODE) {
+        let color = '#99c24750';
+        pathWayData.goodPaths.reverse().forEach((pathway) => {
+          color = colorShade(color, +10);
+          pathway.forEach((spot) => {
+            let tile = this._gameboard.getTile(spot.x, spot.y);
+            tile.color = color;
+          });
         });
-      });
+      }
     }
   }
 }
