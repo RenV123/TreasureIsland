@@ -121,7 +121,7 @@ class Game {
 
     //continue moving every x ms;
     if (!this._moveTimerId) {
-      this._moveTimerId = setInterval(this._move, 50, button.dataset.key);
+      this._moveTimerId = setInterval(this._move, 100, button.dataset.key);
     }
   };
 
@@ -298,7 +298,23 @@ class Game {
   };
 
   startGame = () => {
-    this._drawGame();
+    this._imageManager.loadListOfImages(
+      [
+        './img/tile-grass-1.webp',
+        './img/tile-grass-2.webp',
+        './img/tile-grass-3.webp',
+        './img/tile-grass-4.webp',
+        './img/tile-wall-1.webp',
+        './img/tile-wall-2.webp',
+        './img/tile-wall-3.webp',
+        './img/tile-treasure-1.webp',
+        './img/tile-treasurehunter-1.webp',
+        './img/tile-enemy-1.webp',
+      ],
+      () => {
+        this._drawGame();
+      }
+    );
   };
 }
 
