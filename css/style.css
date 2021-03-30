@@ -13,11 +13,11 @@ body {
   height: auto;
 
   border-style: solid;
-  border-width: 8px 8px 8px 8px;
+  border-width: 11px;
   -moz-border-image: url('./img/border2.webp') 8 8 8 8 repeat repeat;
   -webkit-border-image: url('./img/border.webp') 8 8 8 8 repeat repeat;
   -o-border-image: url('./img/border.webp') 8 8 8 8 repeat repeat;
-  border-image: url('../img/border.webp') 8 8 8 8 repeat repeat;
+  border-image: url('../img/border.webp') 11 11 11 11 repeat repeat;
 }
 
 #game-buttons-container {
