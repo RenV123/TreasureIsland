@@ -37,12 +37,12 @@ export class TreasureHunter extends GameObject {
 
   _moveToTile(tile) {
     if (this._canMoveOnTile(tile)) {
+      this.x = tile.x;
+      this.y = tile.y;
       if (tile.constructor.name == 'Treasure') {
         this.amountOfTreasureCollected++;
         this._onTreasureCollected(tile);
       }
-      this.x = tile.x;
-      this.y = tile.y;
       return true;
     }
     return false;

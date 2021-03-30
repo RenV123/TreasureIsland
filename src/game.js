@@ -245,7 +245,7 @@ class Game {
         this._context.fill();
         break;
       default:
-        console.log(`Drawtype not defined: ${gameObject.toString()}`);
+        console.error(`Drawtype not defined: ${gameObject.toString()}`);
     }
 
     //Debug
@@ -307,12 +307,16 @@ class Game {
   };
 
   _onAllTreasureCollected = () => {
+    this.restartGame();
+  };
+
+  restartGame = () => {
     this._gameboard.generateBoard();
     this._gameboard.placeTreasureHunterAndEnemy(
       this._treasureHunter,
       this._enemy
     );
-    this._drawBoard();
+    this._drawGame();
   };
 
   startGame = () => {
