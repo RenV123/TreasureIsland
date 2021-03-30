@@ -12,20 +12,15 @@ export class Enemy extends GameObject {
   color = '#F94144';
   whiteListedTiles = ['Grass'];
 
-  constructor(
-    gameboard,
-    treasureHunter,
-    x,
-    y,
-    width,
-    height,
-    intelligence = 75
-  ) {
+  constructor(gameboard, treasureHunter, x, y, width, height) {
     super(x, y, width, height);
     this._gameboard = gameboard;
     this._treasureHunter = treasureHunter;
-    this._intelligence = intelligence;
     this.imgSrc = './img/tile-enemy-1.webp';
+
+    //Movement AI
+    this._changeOfStepTowardsPlayer = 75;
+    this._changeWhenClose = 15;
   }
 
   moveToTreasureHunter() {
@@ -35,8 +30,6 @@ export class Enemy extends GameObject {
       this._treasureHunter.pos
     );
 
-    let chanceOfStupidity = getRandomNr(0, 100);
-
     if (window.DEBUG_MODE) {
       pathWayData.listOfCheckedSpots.forEach((spot) => {
         let tile = this._gameboard.getTile(spot.x, spot.y);
@@ -44,10 +37,16 @@ export class Enemy extends GameObject {
       });
     }
     //Make a random move depending on intelligence level
-    if (
-      chanceOfStupidity > this._intelligence ||
-      pathWayData.goodPaths.length == 0
-    ) {
+    let chanceOfStupidity =
+      pathWayData.goodPaths.length == 0 ? 100 : getRandomNr(0, 100);
+
+    //Increase the change of good moves when the enemy is close,
+    //decrease it when further
+    if (pathWayData.goodPaths?.[0]?.length < 5) {
+      chanceOfStupidity -= this._changeWhenClose;
+    } else chanceOfStupidity += this._changeWhenClose;
+
+    if (chanceOfStupidity > this._changeOfStepTowardsPlayer) {
       let surroundingTiles = shuffleArray([
         this._gameboard.getTile(this.x + 1, this.y),
         this._gameboard.getTile(this.x - 1, this.y),
@@ -59,8 +58,8 @@ export class Enemy extends GameObject {
         return (
           tile &&
           this.whiteListedTiles.includes(tile.constructor.name) &&
-          tile.x != pathWayData.goodPaths?.[0]?.[1]?.x &&
-          tile.y != pathWayData.goodPaths?.[0]?.[1]?.y
+          !Vector2D.equals(tile.pos, pathWayData.goodPaths?.[0]?.[1]) &&
+          !Vector2D.equals(tile.pos, this._treasureHunter.pos)
         );
       });
       if (matchingTile) {
@@ -71,8 +70,13 @@ export class Enemy extends GameObject {
         if (window.DEBUG_MODE) matchingTile.color = 'darkred';
       }
     } else if (pathWayData.goodPaths?.[0]?.length > 0) {
-      this.x = pathWayData.goodPaths[0][1].x;
-      this.y = pathWayData.goodPaths[0][1].y;
+      if (
+        pathWayData.goodPaths[0][1].x != this._treasureHunter.x ||
+        pathWayData.goodPaths[0][1].y != this._treasureHunter.y
+      ) {
+        this.x = pathWayData.goodPaths[0][1].x;
+        this.y = pathWayData.goodPaths[0][1].y;
+      }
 
       //Debug draw all goodpaths
       if (window.DEBUG_MODE) {
