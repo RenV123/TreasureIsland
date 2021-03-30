@@ -56,61 +56,78 @@ class Game {
   }
 
   bindEvents = () => {
+    //Is touch supported?
+    this.touch =
+      'ontouchstart' in window ||
+      (window.DocumentTouch && _instanceof(document, DocumentTouch));
+
     document.addEventListener('keydown', this.callbacks.keydown, false);
-    document.addEventListener(
-      'mouseup',
-      this.callbacks.resetKeyButtonStates,
-      false
-    );
-    document.addEventListener(
-      'touchend',
-      this.callbacks.resetKeyButtonStates,
-      false
-    );
     document.addEventListener(
       'keyup',
       this.callbacks.resetKeyButtonStates,
       false
     );
+    this.touch
+      ? document.addEventListener(
+          'touchend',
+          this.callbacks.resetKeyButtonStates,
+          false
+        )
+      : document.addEventListener(
+          'mouseup',
+          this.callbacks.resetKeyButtonStates,
+          false
+        );
 
     Array.from(
       document.querySelectorAll('#game-buttons-container button')
     ).forEach((button) => {
-      button.addEventListener('mousedown', this.callbacks.keyButtonDown, false);
-      button.addEventListener(
-        'touchstart',
-        this.callbacks.keyButtonDown,
-        false
-      );
+      this.touch
+        ? button.addEventListener(
+            'touchstart',
+            this.callbacks.keyButtonDown,
+            false
+          )
+        : button.addEventListener(
+            'mousedown',
+            this.callbacks.keyButtonDown,
+            false
+          );
     });
   };
   unbindEvents = () => {
     document.removeEventListener('keydown', this.callbacks.keydown, false);
     document.removeEventListener(
-      'mouseup',
+      'keyup',
       this.callbacks.resetKeyButtonStates,
       false
     );
-    document.removeEventListener(
-      'touchend',
-      this.callbacks.resetKeyButtonStates,
-      false
-    );
-
     Array.from(
       document.querySelectorAll('#game-buttons-container button')
     ).forEach((button) => {
-      button.removeEventListener(
-        'mousedown',
-        this.callbacks.keyButtonDown,
-        false
-      );
-      button.removeEventListener(
-        'touchstart',
-        this.callbacks.keyButtonDown,
-        false
-      );
+      this.touch
+        ? button.removeEventListener(
+            'touchstart',
+            this.callbacks.keyButtonDown,
+            false
+          )
+        : button.removeEventListener(
+            'mousedown',
+            this.callbacks.keyButtonDown,
+            false
+          );
     });
+    this.touch
+      ? document.removeEventListener(
+          'touchend',
+          this.callbacks.resetKeyButtonStates,
+          false
+        )
+      : document.removeEventListener(
+          'mouseup',
+          this.callbacks.resetKeyButtonStates,
+          false
+        );
   };
 
   _keyButtonDown = (e) => {
@@ -121,6 +138,7 @@ class Game {
 
     //continue moving every x ms;
     if (!this._moveTimerId) {
+      this._move(button.dataset.key);
       this._moveTimerId = setInterval(this._move, 100, button.dataset.key);
     }
   };
