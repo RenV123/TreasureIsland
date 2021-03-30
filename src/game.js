@@ -119,12 +119,9 @@ class Game {
       button.style.background = `no-repeat center/cover url('./img/${button.id}-pressed.webp')`;
     }
 
-    //move first
-    this._move(button.dataset.key);
-
     //continue moving every x ms;
     if (!this._moveTimerId) {
-      this._moveTimerId = setInterval(this._move, 200, button.dataset.key);
+      this._moveTimerId = setInterval(this._move, 50, button.dataset.key);
     }
   };
 
