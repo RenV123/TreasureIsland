@@ -1,15 +1,22 @@
 body {
   background-color: #e5d4bf;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 16px);
 }
 .canvas-container {
   display: flex;
   justify-content: center;
-  height: 100%;
-  width: 100%;
+  flex-grow: 0;
 }
 
 .canvas-container canvas {
-  width: min(calc(100vh - 330px), 100%);
+  /*
+  8px margin around body, 
+  11px border around canvas, 
+  keys are 20vh with 20px margin
+  */
+  width: min(calc(80vh - 78px), 100%);
   height: auto;
 
   border-style: solid;
@@ -25,6 +32,8 @@ body {
   display: flex;
   align-items: center;
   flex-direction: column;
+  justify-content: center;
+  flex-grow: 1;
 }
 
 #game-buttons-container button {
