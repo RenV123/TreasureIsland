@@ -123,51 +123,42 @@ export class GameBoard {
       }
     }
 
-    //Place Enemy in opposite quadrant
+    //Position Enemy in quadrant diagonally from the player
+    let xMin = treasureHunter.x < this._columns / 2 ? this._columns / 2 : 0;
+    let xMax =
+      treasureHunter.x < this._columns / 2
+        ? this._columns - 1
+        : this._columns / 2;
+    let yMin = treasureHunter.y < this._rows / 2 ? this._rows / 2 : 0;
+    let yMax =
+      treasureHunter.y < this._rows / 2 ? this._rows - 1 : this._rows / 2;
 
-    let enemyPos = new Vector2D();
-    if (treasureHunter.x < this._columns / 2) {
-      enemyPos.x = getRandomNr(this._columns / 2, this._columns);
-    } else {
-      enemyPos.x = getRandomNr(0, this._columns / 2);
-    }
+    const grassTilesInQuadrant = this._grassTiles.filter((tile) => {
+      return tile.x > xMin && tile.x < xMax && tile.y > yMin && tile.y < yMax;
+    });
 
-    if (treasureHunter.y < this._rows / 2) {
-      enemyPos.y = getRandomNr(this._rows / 2, this._rows);
-    } else {
-      enemyPos.y = getRandomNr(0, this._rows / 2);
-    }
-
-    let enemyIndex = enemyPos.x * enemyPos.y;
-    let grassTile = this._grassTiles[enemyIndex];
-
-    let firstIndex = enemyIndex;
     foundValidPos = false;
-    let attempts = 0;
-    let maxAttempts = (this._columns / 2) * (this._rows / 2);
-    while (!foundValidPos && attempts < maxAttempts) {
-      if (
-        grassTile &&
-        pathFinder.canFindPathBetweenPoints(grassTile.pos, treasureHunter.pos)
-      ) {
-        enemy.x = grassTile.pos.x;
-        enemy.y = grassTile.pos.y;
-        enemy.width = grassTile.width;
-        enemy.height = grassTile.height;
-        foundValidPos = true;
-      }
-
-      if (enemyIndex >= this._grassTiles.length) {
-        enemyIndex = 0;
-      }
-      grassTile = this._grassTiles[++enemyIndex];
-      attempts++;
-    }
-
-    if (!foundValidPos) {
-      console.error(
-        `Couldnt find valid spot. index: ${firstIndex}, ${enemyIndex}`
-      );
+    if (grassTilesInQuadrant.length > 0) {
+      let startIndex = getRandomNr(0, grassTilesInQuadrant.length - 1);
+      let index = startIndex;
+      do {
+        let tile = grassTilesInQuadrant[index];
+        if (pathFinder.canFindPathBetweenPoints(tile.pos, treasureHunter.pos)) {
+          enemy.x = tile.pos.x;
+          enemy.y = tile.pos.y;
+          enemy.width = tile.width;
+          enemy.height = tile.height;
+          foundValidPos = true;
+          break;
+        } else {
+          index++;
+          if (index === grassTilesInQuadrant.length) index = 0;
+          else if (index === startIndex) {
+            console.error(`Couldn't find a single valid pos in quadrant!`);
+            break;
+          }
+        }
+      } while (!foundValidPos);
     }
   };
 

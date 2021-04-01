@@ -135,6 +135,7 @@ Vector2D.divide = function (a, b) {
   else return new Vector2D(a.x / b, a.y / b);
 };
 Vector2D.equals = function (a, b) {
+  if (!a || !b) return false;
   return a.x == b.x && a.y == b.y;
 };
 Vector2D.dot = function (a, b) {
