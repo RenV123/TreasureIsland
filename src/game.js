@@ -249,7 +249,7 @@ class Game {
     }
 
     //Debug
-    if (this.DEBUG_MODE) {
+    if (window.DEBUG_MODE) {
       this._context.fillStyle = 'white';
       this._context.fillText(
         gameObject.pos.toString(),

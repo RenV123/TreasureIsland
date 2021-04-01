@@ -143,7 +143,14 @@ export class GameBoard {
       let index = startIndex;
       do {
         let tile = grassTilesInQuadrant[index];
-        if (pathFinder.canFindPathBetweenPoints(tile.pos, treasureHunter.pos)) {
+        let pathwayData = pathFinder.findShortestPath(
+          tile.pos,
+          treasureHunter.pos
+        );
+        if (
+          pathwayData.goodPaths.length > 0 &&
+          pathwayData.goodPaths[0].length > 10 //Make sure the enemy is not too close to the hero
+        ) {
           enemy.x = tile.pos.x;
           enemy.y = tile.pos.y;
           enemy.width = tile.width;
