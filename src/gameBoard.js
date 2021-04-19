@@ -109,7 +109,10 @@ export class GameBoard {
 
       let canFindAllTreasure = true;
       this._treasureTiles.forEach((tile) => {
-        if (!pathFinder.canFindPathBetweenPoints(grassTile.pos, tile.pos))
+        if (
+          grassTile.pos.equals(tile.pos) ||
+          !pathFinder.canFindPathBetweenPoints(grassTile.pos, tile.pos)
+        )
           canFindAllTreasure = false;
       });
       if (!canFindAllTreasure) {
