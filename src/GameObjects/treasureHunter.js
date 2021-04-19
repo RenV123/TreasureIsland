@@ -26,6 +26,7 @@ export class TreasureHunter extends GameObject {
     this._onTreasureCollected = onTreasureCollected;
     this._onLivesDecreased = onLivesDecreased;
     this.imgSrc = './img/tile-treasurehunter-1.webp';
+    this.heartImage = Window.IMAGE_MANAGER.loadImage(this.heartImgSrc);
   }
 
   /*
@@ -73,15 +74,17 @@ export class TreasureHunter extends GameObject {
    * @param {Number} canvasHeight The height in pixels of the canvas
    */
   drawUI(context, canvasWidth, canvasHeight) {
-    let image = Window.IMAGE_MANAGER.loadImage(this.heartImgSrc);
     let padding = 5;
+    let width = this.heartImage.width * 1.2;
+    let height = this.heartImage.height * 1.2;
+
     for (let i = 0; i < this.lives; i++) {
       context.drawImage(
-        image,
-        canvasWidth - (image.width + padding) * (this.maxLives - i),
+        this.heartImage,
+        canvasWidth - (width + padding) * (this.maxLives - i),
         padding,
-        image.width,
-        image.height
+        width * 1.2,
+        height * 1.2
       );
     }
   }

@@ -70,6 +70,9 @@ class Game {
     });
   }
 
+  /**
+   * Bind all keyboard, mouse and or touch events.
+   */
   bindEvents = () => {
     //Is touch supported?
     this.touch =
@@ -110,6 +113,7 @@ class Game {
           );
     });
   };
+
   unbindEvents = () => {
     document.removeEventListener('keydown', this.callbacks.keydown, false);
     document.removeEventListener(
@@ -145,7 +149,12 @@ class Game {
         );
   };
 
+  /**
+   * Called when a button is clicked or touched on mobile.
+   * @param {event} e
+   */
   _keyButtonDown = (e) => {
+    //Set button style to pressed.
     let button = e.currentTarget;
     if (button) {
       button.style.background = `no-repeat center/cover url('./img/${button.id}-pressed.webp')`;
@@ -158,6 +167,9 @@ class Game {
     }
   };
 
+  /**
+   *Sets all buttons to their non-pressed state.
+   */
   _resetKeyButtonStates = () => {
     if (this._moveTimerId) {
       clearInterval(this._moveTimerId);
@@ -170,15 +182,11 @@ class Game {
     });
   };
 
+  /**
+   * Callback executed when a key press is done (keyboard only.)
+   */
   _keydown = (e) => {
     if (!this._isGameOver) {
-      let button = document.querySelector(
-        `#game-buttons-container button[data-key="${e.key}"]`
-      );
-      if (button) {
-        button.style.background = `no-repeat center/cover url('./img/${button.id}-pressed.webp')`;
-      }
-
       switch (e.key) {
         case 'ArrowLeft':
         case 'ArrowRight':
@@ -186,10 +194,19 @@ class Game {
         case 'ArrowUp':
           e.preventDefault();
           this._move(e.key);
+
+          //Set UI button style to pressed.
+          let button = document.querySelector(
+            `#game-buttons-container button[data-key="${e.key}"]`
+          );
+          if (button) {
+            button.style.background = `no-repeat center/cover url('./img/${button.id}-pressed.webp')`;
+          }
           break;
         case 'd':
           e.preventDefault();
           if (e.ctrlKey) {
+            //Ctrl+D == debug mode
             window.DEBUG_MODE = !window.DEBUG_MODE;
             this._drawGame();
           }
@@ -199,6 +216,10 @@ class Game {
     }
   };
 
+  /**
+   * Called with the key string, responsible for moving the treasurehunter.
+   * @param {String} key
+   */
   _move = (key) => {
     if (!this._isGameOver) {
       let treasureHunterMoved = false;
@@ -312,6 +333,9 @@ class Game {
     }
   };
 
+  /**
+   * Display a simple high score in the top left corner of the screen.
+   */
   _drawHighScore() {
     //HighScore
     this._context.fillStyle = 'black';
@@ -336,6 +360,9 @@ class Game {
     this._drawHUD();
   };
 
+  /**
+   * Draws the Game over screen.
+   */
   _drawGameOver = () => {
     this._context.fillStyle = 'black';
     this._context.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -357,6 +384,9 @@ class Game {
     );
   };
 
+  /**
+   * Main draw function responsible for drawing all elements of the game.
+   */
   _drawGame = () => {
     if (!this._isGameOver) {
       this._drawBoard();
@@ -390,10 +420,16 @@ class Game {
     }
   };
 
+  /**
+   * Callback executed when all treasure is collected.
+   */
   _onAllTreasureCollected = () => {
     this.nextLevel();
   };
 
+  /**
+   * Restart the game, similar to nextLevel but highsores, lives are reset.
+   */
   restartGame = () => {
     this._treasureHunter.resetLives();
     this.highScore = 0;
@@ -401,6 +437,9 @@ class Game {
     this.nextLevel();
   };
 
+  /**
+   * Generate a new level
+   */
   nextLevel = () => {
     this._treasureHunter.resetTreasureCollectedCount();
     this._gameboard.generateBoard();
