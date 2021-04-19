@@ -21,7 +21,7 @@ export class Enemy extends GameObject {
 
     //Movement AI
     this._changeOfStepTowardsPlayer = 75;
-    this._changeWhenClose = 25;
+    this._changeWhenClose = 10;
   }
 
   move() {
@@ -50,7 +50,7 @@ export class Enemy extends GameObject {
 
     //Increase the change of good moves when the enemy is close,
     //decrease it when further
-    if (pathWayData.goodPaths?.[0]?.length < 5) {
+    if (pathWayData.goodPaths?.[0]?.length < 7) {
       chanceOfStupidity -= this._changeWhenClose;
     } else chanceOfStupidity += this._changeWhenClose;
 
