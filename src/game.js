@@ -24,6 +24,7 @@ class Game {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
     this._context = context;
+    this.highScore = 0;
     this.callbacks = {
       keydown: this._keydown.bind(this),
       keyButtonDown: this._keyButtonDown.bind(this),
@@ -58,6 +59,15 @@ class Game {
     this.bindEvents();
 
     this._isGameOver = false;
+
+    let arcadeFont = new FontFace(
+      'karmatic-arcade',
+      'url("./assets/fonts/karmatic-arcade.ttf")'
+    );
+
+    arcadeFont.load().then(function () {
+      document.fonts.add(arcadeFont);
+    });
   }
 
   bindEvents = () => {
@@ -302,6 +312,18 @@ class Game {
     }
   };
 
+  _drawHighScore() {
+    //HighScore
+    this._context.fillStyle = 'black';
+    this._context.font = '16px karmatic-arcade';
+    this._context.textAlign = 'left';
+    this._context.fillText(this.highScore.toString().padStart(6, '0'), 5, 16);
+  }
+
+  _drawHUD() {
+    this._drawHighScore();
+  }
+
   /**
    * Responsible for drawing all UI elements to the screen
    */
@@ -311,6 +333,7 @@ class Game {
       this.canvasWidth,
       this.canvasHeight
     );
+    this._drawHUD();
   };
 
   _drawGameOver = () => {
@@ -318,7 +341,7 @@ class Game {
     this._context.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
     this._context.fillStyle = 'white';
-    this._context.font = '50px sans serif'; //TODO: find a nice font
+    this._context.font = '50px karmatic-arcade'; //TODO: find a nice font
     this._context.textAlign = 'center';
     this._context.fillText(
       'GAME OVER!',
@@ -326,7 +349,7 @@ class Game {
       this.canvasHeight / 2 - 25 //25 = half the font size
     );
 
-    this._context.font = '16px sans serif'; //TODO: find a nice font
+    this._context.font = '16px karmatic-arcade'; //TODO: find a nice font
     this._context.fillText(
       'Press any key to restart...',
       this.canvasWidth / 2,
@@ -354,6 +377,7 @@ class Game {
    */
   _onTreasureCollected = (treasureTile) => {
     this._gameboard.collectTreasureTile(treasureTile);
+    this.highScore += treasureTile.scoreValue;
   };
 
   /**
@@ -367,17 +391,23 @@ class Game {
   };
 
   _onAllTreasureCollected = () => {
-    this.restartGame();
+    this.nextLevel();
   };
 
   restartGame = () => {
-    this._treasureHunter.reset();
+    this._treasureHunter.resetLives();
+    this.highScore = 0;
+    this._isGameOver = false;
+    this.nextLevel();
+  };
+
+  nextLevel = () => {
+    this._treasureHunter.resetTreasureCollectedCount();
     this._gameboard.generateBoard();
     this._gameboard.placeTreasureHunterAndEnemy(
       this._treasureHunter,
       this._enemy
     );
-    this._isGameOver = false;
     this._drawGame();
   };
 

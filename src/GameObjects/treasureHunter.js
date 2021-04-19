@@ -31,10 +31,13 @@ export class TreasureHunter extends GameObject {
   /*
   Resets lives, treasure counter to the default 
   */
-  reset() {
+  resetLives() {
     this.lives = this.maxLives;
-    this.amountOfTreasureCollected = 0;
   }
+
+  resetTreasureCollectedCount = () => {
+    this.amountOfTreasureCollected = 0;
+  };
 
   moveLeft() {
     let tile = this._gameboard.getTile(this.x - 1, this.y);
