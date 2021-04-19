@@ -11,6 +11,7 @@ export class Enemy extends GameObject {
   type = DrawTypes.IMG;
   color = '#F94144';
   whiteListedTiles = ['Grass'];
+  hasHurtThetreasureHunter = false;
 
   constructor(gameboard, treasureHunter, x, y, width, height) {
     super(x, y, width, height);
@@ -20,10 +21,17 @@ export class Enemy extends GameObject {
 
     //Movement AI
     this._changeOfStepTowardsPlayer = 75;
-    this._changeWhenClose = 15;
+    this._changeWhenClose = 25;
   }
 
-  moveToTreasureHunter() {
+  move() {
+    //Don't move the enemy after hurting the treasurehunter.
+    //Allows the treasurehunter a change to escape the enemy.
+    if (this.hasHurtThetreasureHunter) {
+      this.hasHurtThetreasureHunter = false;
+      return;
+    }
+
     let pathFinder = new PathWayFinder(this._gameboard, this.whiteListedTiles);
     let pathWayData = pathFinder.findShortestPath(
       this.pos,
@@ -59,7 +67,7 @@ export class Enemy extends GameObject {
           tile &&
           this.whiteListedTiles.includes(tile.constructor.name) &&
           !Vector2D.equals(tile.pos, pathWayData.goodPaths?.[0]?.[1]) &&
-          !Vector2D.equals(tile.pos, this._treasureHunter.pos)
+          !Vector2D.equals(tile.pos, this._treasureHunter.pos) //The enemy cannot move on the treasurehunters tile
         );
       });
       if (matchingTile) {
@@ -89,6 +97,11 @@ export class Enemy extends GameObject {
           });
         });
       }
+    }
+
+    if (Vector2D.subtract(this._treasureHunter.pos, this.pos).length() <= 1) {
+      this._treasureHunter.decreaseLives();
+      this.hasHurtThetreasureHunter = true;
     }
   }
 }

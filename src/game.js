@@ -30,7 +30,8 @@ class Game {
       resetKeyButtonStates: this._resetKeyButtonStates.bind(this),
     };
 
-    this._imageManager = new ImageManager();
+    //Create the image manager as a global variable so it can be accessed from anywhere.
+    Window.IMAGE_MANAGER = new ImageManager();
 
     this._gameboard = new GameBoard(
       canvasWidth,
@@ -44,7 +45,9 @@ class Game {
 
     this._treasureHunter = new TreasureHunter(
       this._gameboard,
-      this._onTreasureCollected
+      this._onTreasureCollected,
+      this._onTreasureHunterLivesDecreased,
+      3
     );
     this._enemy = new Enemy(this._gameboard, this._treasureHunter);
 
@@ -53,6 +56,8 @@ class Game {
       this._enemy
     );
     this.bindEvents();
+
+    this._isGameOver = false;
   }
 
   bindEvents = () => {
@@ -156,49 +161,57 @@ class Game {
   };
 
   _keydown = (e) => {
-    let button = document.querySelector(
-      `#game-buttons-container button[data-key="${e.key}"]`
-    );
-    if (button) {
-      button.style.background = `no-repeat center/cover url('./img/${button.id}-pressed.webp')`;
-    }
+    if (!this._isGameOver) {
+      let button = document.querySelector(
+        `#game-buttons-container button[data-key="${e.key}"]`
+      );
+      if (button) {
+        button.style.background = `no-repeat center/cover url('./img/${button.id}-pressed.webp')`;
+      }
 
-    switch (e.key) {
-      case 'ArrowLeft':
-      case 'ArrowRight':
-      case 'ArrowDown':
-      case 'ArrowUp':
-        e.preventDefault();
-        this._move(e.key);
-        break;
-      case 'd':
-        e.preventDefault();
-        if (e.ctrlKey) {
-          window.DEBUG_MODE = !window.DEBUG_MODE;
-          this._drawGame();
-        }
+      switch (e.key) {
+        case 'ArrowLeft':
+        case 'ArrowRight':
+        case 'ArrowDown':
+        case 'ArrowUp':
+          e.preventDefault();
+          this._move(e.key);
+          break;
+        case 'd':
+          e.preventDefault();
+          if (e.ctrlKey) {
+            window.DEBUG_MODE = !window.DEBUG_MODE;
+            this._drawGame();
+          }
+      }
+    } else {
+      this.restartGame();
     }
   };
 
   _move = (key) => {
-    let treasureHunterMoved = false;
-    switch (key) {
-      case 'ArrowLeft':
-        treasureHunterMoved = this._treasureHunter.moveLeft();
-        break;
-      case 'ArrowRight':
-        treasureHunterMoved = this._treasureHunter.moveRight();
-        break;
-      case 'ArrowDown':
-        treasureHunterMoved = this._treasureHunter.moveDown();
-        break;
-      case 'ArrowUp':
-        treasureHunterMoved = this._treasureHunter.moveUp();
-        break;
-    }
-    if (treasureHunterMoved) {
-      this._enemy.moveToTreasureHunter();
-      this._drawGame();
+    if (!this._isGameOver) {
+      let treasureHunterMoved = false;
+      switch (key) {
+        case 'ArrowLeft':
+          treasureHunterMoved = this._treasureHunter.moveLeft();
+          break;
+        case 'ArrowRight':
+          treasureHunterMoved = this._treasureHunter.moveRight();
+          break;
+        case 'ArrowDown':
+          treasureHunterMoved = this._treasureHunter.moveDown();
+          break;
+        case 'ArrowUp':
+          treasureHunterMoved = this._treasureHunter.moveUp();
+          break;
+      }
+      if (treasureHunterMoved) {
+        this._enemy.move();
+        this._drawGame();
+      }
+    } else {
+      this.restartGame();
     }
   };
 
@@ -208,11 +221,11 @@ class Game {
    * @private
    */
   _drawGameObject = (gameObject) => {
-    this._context.fillStyle = gameObject?.color ?? 'pink';
+    this._context.fillStyle = gameObject?.color ?? 'pink'; //We use to pink in case a color isn't set.
 
     switch (gameObject.type) {
       case DrawTypes.IMG:
-        let image = this._imageManager.loadImage(gameObject.imgSrc);
+        let image = Window.IMAGE_MANAGER.loadImage(gameObject.imgSrc);
         if (image?.complete) {
           this._context.drawImage(
             image,
@@ -263,30 +276,25 @@ class Game {
 
   /**
    * Draws all the tiles of the board on the canvas
+   * TODO: move this code to the gameboard class.
    * @private
    */
   _drawBoard = () => {
     //draw background same as grass
     if (this._gameboard.tiles.length > 0) {
-      /* this._context.fillStyle = new Grass().color;
-      this._context.fillRect(0, 0, this.canvasWidth, this.canvasHeight);*/
-
       this._gameboard.tiles.forEach((tilesRow) => {
         tilesRow.forEach((tile) => {
           //FIXME: we assume the tile dimensions don't exceed canvas dimensions
-          //if (tile.constructor.name !== 'Grass') {
-          //Don't render the grass tiles for now.
           this._drawGameObject(tile);
-          //}
         });
       });
-
-      //Temporary debug code
+    }
+    if (window.DEBUG_MODE) {
       let grassColor = new Grass().color;
       this._gameboard.tiles.forEach((tilesRow) => {
         tilesRow.forEach((tile) => {
           //FIXME: we assume the tile dimensions don't exceed canvas dimensions
-          if (tile.constructor.name === 'Grass') {
+          if (tile instanceof Grass) {
             tile.color = grassColor;
           }
         });
@@ -294,11 +302,53 @@ class Game {
     }
   };
 
-  _drawGame = () => {
-    this._drawBoard();
-    this._drawGameObject(this._treasureHunter);
-    this._drawGameObject(this._enemy);
+  /**
+   * Responsible for drawing all UI elements to the screen
+   */
+  _drawUI = () => {
+    this._treasureHunter.drawUI(
+      this._context,
+      this.canvasWidth,
+      this.canvasHeight
+    );
   };
+
+  _drawGameOver = () => {
+    this._context.fillStyle = 'black';
+    this._context.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+    this._context.fillStyle = 'white';
+    this._context.font = '50px sans serif'; //TODO: find a nice font
+    this._context.textAlign = 'center';
+    this._context.fillText(
+      'GAME OVER!',
+      this.canvasWidth / 2,
+      this.canvasHeight / 2 - 25 //25 = half the font size
+    );
+
+    this._context.font = '16px sans serif'; //TODO: find a nice font
+    this._context.fillText(
+      'Press any key to restart...',
+      this.canvasWidth / 2,
+      this.canvasHeight / 2 + 50 //50 = font size
+    );
+  };
+
+  _drawGame = () => {
+    if (!this._isGameOver) {
+      this._drawBoard();
+      this._drawGameObject(this._treasureHunter);
+      this._drawGameObject(this._enemy);
+      this._drawUI();
+    } else {
+      this._drawGameOver();
+    }
+  };
+
+  _gameOver = () => {
+    this._isGameOver = true;
+  };
+
   /**
    * Called when the treasurehunter collects treasure.
    */
@@ -306,21 +356,33 @@ class Game {
     this._gameboard.collectTreasureTile(treasureTile);
   };
 
+  /**
+   * Called when the treasurehunter lives are decreased.
+   * @param {Number} lives
+   */
+  _onTreasureHunterLivesDecreased = (lives) => {
+    if (lives === 0) {
+      this._gameOver();
+    }
+  };
+
   _onAllTreasureCollected = () => {
     this.restartGame();
   };
 
   restartGame = () => {
+    this._treasureHunter.reset();
     this._gameboard.generateBoard();
     this._gameboard.placeTreasureHunterAndEnemy(
       this._treasureHunter,
       this._enemy
     );
+    this._isGameOver = false;
     this._drawGame();
   };
 
   startGame = () => {
-    this._imageManager.loadListOfImages(
+    Window.IMAGE_MANAGER.loadListOfImages(
       [
         './img/tile-grass-1.webp',
         './img/tile-grass-2.webp',
